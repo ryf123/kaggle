@@ -16,12 +16,15 @@ class Model:
 
 def process_data(df):
 	df["Sex"] = df["Sex"].apply(lambda x: x == "male")
+	df["first_class"] = df["Pclass"].apply(lambda x: x == 1)
+	df["second_class"] = df["Pclass"].apply(lambda x: x == 2)
+	df["third_class"] = df["Pclass"].apply(lambda x: x == 3)
 	df["Fare"] = df["Fare"].apply(lambda x: 0 if np.isnan(x) else x)
 	df["Age"] = df["Age"].apply(lambda x: -1 if np.isnan(x) else x)
 	df["infant"] = df["Age"].apply(lambda x: x < 3 and x >= 0)
 	df["child"] = df["Age"].apply(lambda x: x < 10 and x >= 3)
 	df["teen"] = df["Age"].apply(lambda x: x < 18 and x >= 10)
-	df["senior"] = df["Age"].apply(lambda x: x >= 50 )
+	df["senior"] = df["Age"].apply(lambda x: x >= 50)
 	df["adult"] = df["Age"].apply(lambda x: x < 50 and x >= 18 )
 	df["Embark_C"] = df["Embarked"].apply(lambda x: x == "C")
 	df["Embark_S"] = df["Embarked"].apply(lambda x: x == "S")
@@ -32,8 +35,13 @@ def process_data(df):
 
 submit = True
 
-features = ["SibSp","Fare", "Sex", "Pclass", "Age", 
-"Embark_C", "Embark_S", "Embark_Q", "infant", "child", "senior", "adult", "teen", "Parch", "family_size"]
+features = [
+			"Fare", "Sex",
+			"first_class", "second_class", "third_class",
+			"Embark_C", "Embark_S", "Embark_Q",
+			"infant", "child", "senior", "adult", "teen", "Age",
+			"Parch", "family_size", "SibSp",
+]
 
 df = pd.read_csv("train.csv", doublequote=True)
 df = process_data(df)
@@ -56,7 +64,7 @@ predictions = model.predict(test_df.as_matrix(features))
 
 if submit:
 	test_df["Survived"] = predictions
-	test_df.to_csv("predict.csv", columns = ["PassengerId", "Survived"], index=False)
+	test_df.to_csv("predict.csv", columns=["PassengerId", "Survived"], index=False)
 else:
 	correct = 0
 	for i, p in enumerate(test_df["Survived"].values):
